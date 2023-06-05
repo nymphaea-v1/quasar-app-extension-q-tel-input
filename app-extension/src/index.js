@@ -6,12 +6,14 @@
  * API: https://github.com/quasarframework/quasar/blob/master/app/lib/app-extension/IndexAPI.js
  */
 
-function extendConf (conf) {
+function extendConf (conf, api) {
   // register our boot file
   conf.boot.push('~quasar-app-extension-q-tel-input/src/boot/register.js')
 
   // make sure app extension files & ui package gets transpiled
-  conf.build.transpileDependencies.push(/quasar-app-extension-q-tel-input[\\/]src/)
+  if (!api.hasVite) {
+    conf.build.transpileDependencies.push(/quasar-app-extension-q-tel-input[\\/]src/)
+  }
 
   // make sure the stylesheet goes through webpack to avoid SSR issues
   conf.css.push('~quasar-ui-q-tel-input/src/index.sass')
