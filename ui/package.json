@@ -52,5 +52,8 @@
     "last 4 ChromeAndroid versions",
     "last 4 FirefoxAndroid versions",
     "last 4 iOS versions"
-  ]
+  ],
+  "dependencies": {
+    "vue-country-flag-next": "^2.3.2"
+  }
 }
