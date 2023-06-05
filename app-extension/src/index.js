@@ -14,9 +14,6 @@ function extendConf (conf, api) {
   if (!api.hasVite) {
     conf.build.transpileDependencies.push(/quasar-app-extension-q-tel-input[\\/]src/)
   }
-
-  // make sure the stylesheet goes through webpack to avoid SSR issues
-  conf.css.push('~quasar-ui-q-tel-input/src/index.sass')
 }
 
 module.exports = function (api) {
