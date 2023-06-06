@@ -1,0 +1,22 @@
+{
+  "extends": [
+    "eslint:recommended",
+    "plugin:vue/vue3-recommended"
+  ],
+  "env": {
+      "node": true
+  },
+  "globals": {
+    "__UI_VERSION__": "readonly"
+  },
+  "rules": {
+    "max-len": ["warn", {
+      "code": 120,
+      "comments": 120
+    }],
+    "vue/first-attribute-linebreak": ["error", {
+      "singleline": "beside",
+      "multiline": "below"
+    }]
+  }
+}

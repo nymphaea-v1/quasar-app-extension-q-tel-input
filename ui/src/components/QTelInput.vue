@@ -1,5 +1,8 @@
 <template>
-  <country-flag country='th' size='small' />
+  <country-flag
+    country="th"
+    size="small"
+  />
   <q-badge color="red">
     Test
   </q-badge>
