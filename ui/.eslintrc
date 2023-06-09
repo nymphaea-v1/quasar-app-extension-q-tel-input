@@ -1,6 +1,9 @@
 {
+  "parserOptions": {
+    "ecmaVersion": 2023
+  },
   "extends": [
-    "eslint:recommended",
+    "standard",
     "plugin:vue/vue3-recommended"
   ],
   "env": {
