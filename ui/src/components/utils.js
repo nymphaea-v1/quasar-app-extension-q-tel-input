@@ -23,7 +23,7 @@ export const countriesMap = Object.fromEntries(countries.map((country) => {
 export const getCountriesByCallingCode = (callingCode) => {
   const result = []
 
-  Object.values(countriesMap).forEach((country, code) => {
+  Object.entries(countriesMap).forEach(([code, country]) => {
     if (country.callingCode === callingCode) result.push(code)
   })
 

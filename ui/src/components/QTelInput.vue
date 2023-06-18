@@ -78,7 +78,7 @@ watch(() => props.modelValue, (newValue) => {
 
   nationalNumber.value = proceededNumber.nationalNumber
   country.value = proceededNumber.country ||
-    proceededNumber.possibleCountries.shift() ||
+    proceededNumber.possibleCountries[0] ||
     fallbackCountry.value
 }, { immediate: true })
 
