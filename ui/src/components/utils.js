@@ -5,7 +5,7 @@ import {
   AsYouType,
   getExampleNumber,
   parsePhoneNumber
-} from 'libphonenumber-js/mobile'
+} from 'libphonenumber-js'
 
 const locale = navigator ? navigator.language : 'en'
 const getCountryDisplayName = new Intl.DisplayNames([locale], { type: 'region' })
