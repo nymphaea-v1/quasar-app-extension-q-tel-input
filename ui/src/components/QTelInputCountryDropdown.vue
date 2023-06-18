@@ -22,6 +22,7 @@
         <q-item
           v-for="{ country, label } in countryList"
           :key="country"
+          v-close-popup
           :dense="dense"
           clickable
           class="row items-center no-wrap"
