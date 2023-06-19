@@ -11,7 +11,7 @@
     <template #prepend>
       <q-tel-input-country-dropdown
         v-model="country"
-        :country-list="countryList"
+        :country-list="validatedCountryList"
         :dense="dense"
         :style="dropdownStyles"
         @update:model-value="inputElement.validate()"
@@ -26,7 +26,14 @@ import QTelInputCountryDropdown from './QTelInputCountryDropdown.vue'
 
 import { ref, computed, watch } from 'vue'
 
-import { proceedNumber, countriesMap, isValidPhoneNumberForCountry, getNationalMask } from './utils'
+import {
+  proceedNumber,
+  countriesMap,
+  normalizeCountry,
+  isSupportedCountry,
+  isValidPhoneNumberForCountry,
+  getNationalMask
+} from './utils'
 
 const props = defineProps({
   modelValue: {
@@ -35,11 +42,17 @@ const props = defineProps({
   },
   defaultCountry: {
     type: String,
-    default: undefined
+    default: undefined,
+    validator: (value) => {
+      return isSupportedCountry(normalizeCountry(value))
+    }
   },
   countryList: {
     type: Array,
-    default: undefined
+    default: undefined,
+    validator: (value) => {
+      return Array.isArray(value) && value.every(value => isSupportedCountry(normalizeCountry(value)))
+    }
   },
   outlined: {
     type: Boolean,
@@ -53,10 +66,33 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue'])
 
+const validatedDefaultCountry = computed(() => {
+  return normalizeCountry(props.defaultCountry)
+})
+
+const validatedCountryList = computed(() => {
+  if (!Array.isArray(props.countryList)) return undefined
+
+  const result = []
+  props.countryList.forEach((country) => {
+    country = normalizeCountry(country)
+    if (isSupportedCountry(country)) result.push(country)
+  })
+
+  return result
+})
+
 const FALLBACK_COUNTRY = 'US'
+
 const fallbackCountry = computed(() => {
-  if (props.defaultCountry) return props.defaultCountry
-  if (Array.isArray(props.countryList) && props.countryList.length !== 0) return props.countryList[0]
+  if (validatedDefaultCountry.value) {
+    return validatedDefaultCountry.value
+  }
+
+  if (validatedCountryList.value !== undefined && validatedCountryList.value.length !== 0) {
+    return validatedCountryList.value[0]
+  }
+
   return FALLBACK_COUNTRY
 })
 

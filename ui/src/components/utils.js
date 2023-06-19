@@ -11,6 +11,7 @@ const locale = navigator ? navigator.language : 'en'
 const getCountryDisplayName = new Intl.DisplayNames([locale], { type: 'region' })
 
 export const countries = getCountries()
+
 export const countriesMap = Object.fromEntries(countries.map((country) => {
   const countryInfo = {
     name: getCountryDisplayName.of(country),
@@ -19,6 +20,14 @@ export const countriesMap = Object.fromEntries(countries.map((country) => {
 
   return [country, countryInfo]
 }))
+
+export const normalizeCountry = (country) => {
+  return typeof country === 'string' && country.length === 2 ? country.toUpperCase() : undefined
+}
+
+export const isSupportedCountry = (country) => {
+  return typeof country === 'string' && countries.includes(country)
+}
 
 export const getCountriesByCallingCode = (callingCode) => {
   const result = []
@@ -60,7 +69,7 @@ export const isValidPhoneNumberForCountry = (phoneNumberString, country) => {
   let phoneNumber
   try {
     phoneNumber = parsePhoneNumber(phoneNumberString, { defaultCountry: country, extract: false })
-  } catch (_) {}
+  } catch {}
 
   return !!phoneNumber && phoneNumber.country === country && phoneNumber.isValid()
 }
