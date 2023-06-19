@@ -42,7 +42,7 @@
 </template>
 
 <script setup>
-import { QBtnDropdown, QItem, QList } from 'quasar'
+import { QBtnDropdown, QItem, QList, ClosePopup as vClosePopup } from 'quasar'
 
 import { computed } from 'vue'
 import CountryFlag from 'vue-country-flag-next'
