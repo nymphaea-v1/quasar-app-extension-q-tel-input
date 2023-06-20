@@ -12,6 +12,10 @@ module.exports = function (ctx) {
       'register.js'
     ],
 
+    css: [
+      'app.sass'
+    ],
+
     extras: [
       // 'ionicons-v4',
       // 'mdi-v5',
