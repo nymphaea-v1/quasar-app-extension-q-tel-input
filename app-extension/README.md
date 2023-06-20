@@ -2,7 +2,8 @@
 [![npm](https://img.shields.io/npm/dt/quasar-app-extension-q-tel-input.svg)](https://www.npmjs.com/package/quasar-app-extension-q-tel-input)
 
 
-App extension that adds a simple International Telephone Input component for Quasar
+App extension that adds a simple International Telephone Input component for Quasar.
+**Compatible with Quasar UI v2 and Vue 3**.
 
 
 # Install
