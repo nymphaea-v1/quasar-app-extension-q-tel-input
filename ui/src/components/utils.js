@@ -82,7 +82,12 @@ export const validateNumberForCountry = (phoneNumberString, country) => {
 // AsYouType.getTemplate() doesn't fit because it can give template with or without calling code and +
 export const getNationalMask = (country) => {
   const phone = getExampleNumber(country, examples)
-  const mask = phone.format('NATIONAL', { nationalPrefix: false }).replaceAll(/\d/g, '#')
+  const national = phone.format('NATIONAL').split(/\d/g)
 
+  const maskLength = phone.nationalNumber.length
+  const nationalLength = national.length
+  const maskStart = Math.max(0, nationalLength - maskLength - 1)
+
+  const mask = national.slice(maskStart).join('#').trim()
   return mask
 }
