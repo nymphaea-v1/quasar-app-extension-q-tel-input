@@ -69,6 +69,10 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
+  dense: {
+    type: Boolean,
+    default: false
+  },
   dropdownProps: {
     type: Object,
     default: undefined
