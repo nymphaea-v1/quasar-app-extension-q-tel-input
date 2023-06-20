@@ -67,6 +67,14 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
+  filled: {
+    type: Boolean,
+    default: false
+  },
+  rounded: {
+    type: Boolean,
+    default: false
+  },
   dropdownProps: {
     type: Object,
     default: undefined
@@ -155,7 +163,9 @@ watch(number, (newValue) => {
 
 const inputModifierClasses = computed(() => {
   return {
-    'q-tel-input--outlined': props.outlined
+    'q-tel-input--outlined': props.outlined,
+    'q-tel-input--filled': props.filled,
+    'q-tel-input--rounded': props.rounded
   }
 })
 </script>
