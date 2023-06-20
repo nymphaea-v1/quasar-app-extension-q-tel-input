@@ -6,16 +6,43 @@ A simple International Telephone Input component for Quasar.
 **Compatible with Quasar UI v2 and Vue 3**.
 
 
+# Documentation
+### Dependencies
+- [libphonenumber-js](https://www.npmjs.com/package/libphonenumber-js) for parsing and validating numbers
+- [vue-country-flag-next](https://www.npmjs.com/package/vue-country-flag-next) for country flag icons
+
+### Countries
+All countries are represent by their [alfa2 code](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2). List of all countries is taken from [getCountries()](https://gitlab.com/catamphetamine/libphonenumber-js/-/blob/master/README.md#getcountries-string).
+
+### Props
+| Name           | Type     | Required | Default   | Description                                                                                                    |
+| -------------- | -------- | -------- | --------- | -------------------------------------------------------------------------------------------------------------- |
+| defaultCountry | String   | -        | 'US'      | Country that selected by default                                                                               |
+| countryList    | Array    | -        | All       | Available countries in dropdown options list                                                                   |
+| strictness     | String   | -        | 'FULL'    | Validation strictness. One of ['NONE', 'LENGTH', 'FULL'] (see below for details)                               |
+| dropdownProps  | Object   | -        | -         | Props passed to QBtnDropdown                                                                                   |
+| search         | Boolean  | -        | false     | Searchbar for countries in dropdown                                                                            |
+
+...and props available for [QInput](https://quasar.dev/vue-components/input#qinput-api).
+
+### Validation
+QTelInput validates value and highlights errors depending on the strictness:
+- **NONE** - no validation and highlighting at all
+- **LENGTH** - validate only length
+- **FULL** - validate length and number itself
+
+
 # Install
-
 ## Quasar CLI project
-
-Install the [App Extension](../app-extension).
+Install the [App Extension](../app-extension):
+```bash
+quasar ext add q-tel-input
+```
+Quasar CLI will retrieve it from NPM and install the extension.
 
 **OR**:
 
 Create and register a boot file:
-
 ```js
 import Vue from 'vue'
 import Plugin from 'quasar-ui-q-tel-input'
@@ -45,7 +72,6 @@ export default {
 
 
 ## Vue CLI project
-
 ```js
 import Vue from 'vue'
 import Plugin from 'quasar-ui-q-tel-input'
@@ -75,11 +101,8 @@ export default {
 
 
 ## UMD variant
-
 Exports `window.qTelInput`.
-
 Add the following tag(s) after the Quasar ones:
-
 ```html
 <head>
   <!-- AFTER the Quasar stylesheet tags: -->
