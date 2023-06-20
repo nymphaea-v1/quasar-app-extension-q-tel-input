@@ -21,8 +21,8 @@
           v-for="{ country, label } in countryList"
           :key="country"
           v-close-popup
-          :dense="dense"
           clickable
+          dense
           class="q-country-code-select__option q-country-code-option"
           @click="selectCountry(country)"
         >
@@ -56,10 +56,6 @@ const props = defineProps({
   countryList: {
     type: Array,
     default: () => countries
-  },
-  dense: {
-    type: Boolean,
-    default: false
   },
   getItemLabel: {
     type: Function,

@@ -15,7 +15,6 @@
         v-bind="dropdownProps"
         v-model="country"
         :country-list="validatedCountryList"
-        :dense="dense"
         class="q-tel-input__select"
         @update:model-value="inputElement.validate()"
       />
@@ -65,10 +64,6 @@ const props = defineProps({
     }
   },
   outlined: {
-    type: Boolean,
-    default: false
-  },
-  dense: {
     type: Boolean,
     default: false
   },
