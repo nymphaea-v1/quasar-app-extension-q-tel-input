@@ -3,18 +3,16 @@
     unelevated
     dense
     square
-    class="full-height"
+    class="q-country-code-select"
   >
     <template #label>
-      <div
-        class="row items-center no-wrap relative-position"
-        style="right: -8px;"
-      >
+      <div class="q-country-code-select__selected q-country-code-option">
         <country-flag
-          v-bind="FLAG_PROPS"
+          size="small"
           :country="selectedCountry"
+          class="q-country-code-option__flag q-country-code-option__flag--basic"
         />
-        <span class="q-pl-sm">{{ selectedCallingCode }}</span>
+        <span class="q-country-code-option__label">{{ selectedCallingCode }}</span>
       </div>
     </template>
     <template #default>
@@ -25,14 +23,15 @@
           v-close-popup
           :dense="dense"
           clickable
-          class="row items-center no-wrap"
+          class="q-country-code-select__option q-country-code-option"
           @click="selectCountry(country)"
         >
           <country-flag
-            v-bind="FLAG_PROPS"
+            size="small"
             :country="country"
+            class="q-country-code-option__flag q-country-code-option__flag--basic"
           />
-          <span class="q-pl-sm text-no-wrap">
+          <span class="q-country-code-option__label q-pl-sm text-no-wrap">
             {{ label }}
           </span>
         </q-item>
@@ -98,10 +97,5 @@ const countryList = computed(() => {
 
 const selectCountry = (country) => {
   selectedCountry.value = country
-}
-
-const FLAG_PROPS = {
-  size: 'small',
-  style: 'transform: scale(0.36); margin-top: -1em;'
 }
 </script>

@@ -1,19 +1,22 @@
 <template>
   <q-input
-    v-bind="$props"
     ref="inputElement"
+    v-bind="$props"
     v-model="nationalNumber"
     :rules="[checkValid]"
     :mask="mask"
     unmasked-value
     fill-mask
+    class="q-tel-input"
+    :class="inputModifierClasses"
   >
     <template #prepend>
-      <q-tel-input-country-dropdown
+      <q-country-code-select
+        v-bind="dropdownProps"
         v-model="country"
         :country-list="validatedCountryList"
         :dense="dense"
-        :style="dropdownStyles"
+        class="q-tel-input__select"
         @update:model-value="inputElement.validate()"
       />
     </template>
@@ -22,7 +25,7 @@
 
 <script setup>
 import { QInput } from 'quasar'
-import QTelInputCountryDropdown from './QTelInputCountryDropdown.vue'
+import QCountryCodeSelect from './QCountryCodeSelect.vue'
 
 import { ref, computed, watch } from 'vue'
 
@@ -66,9 +69,9 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
-  dense: {
-    type: Boolean,
-    default: false
+  dropdownProps: {
+    type: Object,
+    default: undefined
   }
 })
 
@@ -143,13 +146,9 @@ watch(number, (newValue) => {
   emit('update:modelValue', newValue)
 })
 
-const dropdownStyles = computed(() => {
-  const gap = props.dense ? 4 : 10
-
-  const marginLeft = `${props.outlined ? -12 - gap : -gap}px`
-  const paddingLeft = props.outlined ? `${gap}px` : undefined
-  const right = `${-gap}px`
-
-  return { marginLeft, paddingLeft, right }
+const inputModifierClasses = computed(() => {
+  return {
+    'q-tel-input--outlined': props.outlined
+  }
 })
 </script>
