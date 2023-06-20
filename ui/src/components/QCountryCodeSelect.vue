@@ -16,9 +16,23 @@
       </div>
     </template>
     <template #default>
-      <q-list>
+      <q-list class="q-country-code-select__options">
         <q-item
-          v-for="{ country, label } in countryList"
+          v-if="search"
+          class="q-country-code-select__search"
+        >
+          <q-input
+            v-model="filterString"
+            autofocus
+            dense
+          >
+            <template #prepend>
+              <q-icon name="search" />
+            </template>
+          </q-input>
+        </q-item>
+        <q-item
+          v-for="{ country, label } in filteredCountryList"
           :key="country"
           v-close-popup
           clickable
@@ -43,7 +57,7 @@
 <script setup>
 import { QBtnDropdown, QItem, QList, ClosePopup as vClosePopup } from 'quasar'
 
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import CountryFlag from 'vue-country-flag-next'
 
 import { countries, countriesMap } from './utils'
@@ -60,24 +74,16 @@ const props = defineProps({
   getItemLabel: {
     type: Function,
     default: (code, callingCode, name) => `${name} +${callingCode}`
+  },
+  search: {
+    type: Boolean,
+    default: true
   }
 })
 
 const emit = defineEmits(['update:modelValue'])
 
-const selectedCountry = computed({
-  get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value)
-})
-
-const selectedCallingCode = computed(() => {
-  if (typeof selectedCountry.value !== 'string') return undefined
-
-  const country = selectedCountry.value.toUpperCase()
-  return country in countriesMap ? `+${countriesMap[country].callingCode}` : undefined
-})
-
-const countryList = computed(() => {
+const processedCountryList = computed(() => {
   const result = []
 
   props.countryList.forEach((country) => {
@@ -89,6 +95,26 @@ const countryList = computed(() => {
   })
 
   return result
+})
+
+const filterString = ref('')
+const filteredCountryList = computed(() => processedCountryList.value.filter(({ label }) => {
+  const countryName = label.toLowerCase()
+  const needle = filterString.value.toLowerCase()
+
+  return countryName.indexOf(needle) >= 0
+}))
+
+const selectedCountry = computed({
+  get: () => props.modelValue,
+  set: (value) => emit('update:modelValue', value)
+})
+
+const selectedCallingCode = computed(() => {
+  if (typeof selectedCountry.value !== 'string') return undefined
+
+  const country = selectedCountry.value.toUpperCase()
+  return country in countriesMap ? `+${countriesMap[country].callingCode}` : undefined
 })
 
 const selectCountry = (country) => {

@@ -14,6 +14,7 @@
       <q-country-code-select
         v-bind="dropdownProps"
         v-model="country"
+        :search="search"
         :country-list="validatedCountryList"
         class="q-tel-input__select"
         @update:model-value="inputElement.validate()"
@@ -78,6 +79,10 @@ const props = defineProps({
   dropdownProps: {
     type: Object,
     default: undefined
+  },
+  search: {
+    type: Boolean,
+    default: false
   }
 })
 
