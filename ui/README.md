@@ -5,6 +5,10 @@
 A simple International Telephone Input component for Quasar.
 **Compatible with Quasar UI v2 and Vue 3**.
 
+<div align="center">
+  <img src="https://i.imgur.com/etN0Y5C.gif" width="600" alt="Preview GIF"  />
+</div>
+
 
 # Documentation
 ### Dependencies
@@ -166,4 +170,4 @@ If you appreciate the work that went into this, please consider [donating to Qua
 
 
 # License
-MIT (c) nymphaea-v1 <roselin.6@yandex.ru>
+MIT (c) nymphaea-v1
