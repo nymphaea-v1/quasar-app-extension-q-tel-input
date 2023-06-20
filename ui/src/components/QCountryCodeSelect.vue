@@ -55,7 +55,7 @@
 </template>
 
 <script setup>
-import { QBtnDropdown, QItem, QList, ClosePopup as vClosePopup } from 'quasar'
+import { QBtnDropdown, QItem, QList, QInput, QIcon, ClosePopup as vClosePopup } from 'quasar'
 
 import { computed, ref } from 'vue'
 import CountryFlag from 'vue-country-flag-next'
