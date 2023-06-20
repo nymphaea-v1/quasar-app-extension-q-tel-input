@@ -70,7 +70,7 @@ onMounted(() => {
   TOGGLE_OPTIONS.forEach((option) => inputProps.value[option] = false)
 })
 
-// const LABEL_HINT = 'Label shifts national number. IMHO it looks pretty bad and fixing it in my TODO list'
+const LABEL_HINT = 'Label shifts national number. IMHO it looks pretty bad and fixing it in my TODO list'
 
 const updateLabel = (value) => {
   inputProps.value.label = value === '' ? undefined : value
