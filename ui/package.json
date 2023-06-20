@@ -1,6 +1,6 @@
 {
   "name": "quasar-ui-q-tel-input",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "author": "nymphaea-v1 <roselin.6@yandex.ru>",
   "description": "International Telephone Input UI component for Quasar",
   "license": "MIT",
@@ -21,7 +21,7 @@
   },
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "git+https://github.com/nymphaea-v1/quasar-app-extension-q-tel-input.git"
   },
   "bugs": "",
   "homepage": "",
