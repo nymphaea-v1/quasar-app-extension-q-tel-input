@@ -27,6 +27,7 @@ Create and register a boot file:
 ```js
 import Vue from 'vue'
 import Plugin from 'quasar-ui-q-tel-input'
+import 'quasar-ui-q-tel-input/dist/index.css'
 
 Vue.use(Plugin)
 ```
@@ -34,13 +35,18 @@ Vue.use(Plugin)
 **OR**:
 
 ```html
+<style src="quasar-ui-q-tel-input/dist/index.css"></style>
+
 <script>
 import { Component as QTelInput } from 'quasar-ui-q-tel-input'
 
 export default {
+  
   components: {
     QTelInput
   }
+  
+  
 }
 </script>
 ```
@@ -50,6 +56,7 @@ export default {
 ```js
 import Vue from 'vue'
 import Plugin from 'quasar-ui-q-tel-input'
+import 'quasar-ui-q-tel-input/dist/index.css'
 
 Vue.use(Plugin)
 ```
@@ -57,13 +64,18 @@ Vue.use(Plugin)
 **OR**:
 
 ```html
+<style src="quasar-ui-q-tel-input/dist/index.css"></style>
+
 <script>
 import { Component as QTelInput } from 'quasar-ui-q-tel-input'
 
 export default {
+  
   components: {
     QTelInput
   }
+  
+  
 }
 </script>
 ```
@@ -75,11 +87,18 @@ Exports `window.qTelInput`.
 Add the following tag(s) after the Quasar ones:
 
 ```html
+<head>
+  <!-- AFTER the Quasar stylesheet tags: -->
+  <link href="https://cdn.jsdelivr.net/npm/quasar-ui-q-tel-input/dist/index.min.css" rel="stylesheet" type="text/css">
+</head>
 <body>
   <!-- at end of body, AFTER Quasar script(s): -->
   <script src="https://cdn.jsdelivr.net/npm/quasar-ui-q-tel-input/dist/index.umd.min.js"></script>
 </body>
 ```
+If you need the RTL variant of the CSS, then go for the following (instead of the above stylesheet link):
+```html
+<link href="https://cdn.jsdelivr.net/npm/quasar-ui-q-tel-input/dist/index.rtl.min.css" rel="stylesheet" type="text/css">
 ```
 
 # Setup
