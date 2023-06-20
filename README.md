@@ -3,7 +3,7 @@
 
 
 App extension that adds a simple International Telephone Input component for Quasar.
-Compatible with Quasar UI v2 and Vue 3.
+**Compatible with Quasar UI v2 and Vue 3**.
 
 
 # Install
