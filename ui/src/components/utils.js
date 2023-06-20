@@ -4,8 +4,7 @@ import {
   getCountryCallingCode,
   AsYouType,
   getExampleNumber,
-  validatePhoneNumberLength,
-  parsePhoneNumberWithError,
+  parsePhoneNumber,
   ParseError
 } from 'libphonenumber-js'
 
@@ -69,17 +68,15 @@ export const proceedNumber = (number) => {
 
 export const validateNumberForCountry = (phoneNumberString, country) => {
   try {
-    const phoneNumber = parsePhoneNumberWithError(phoneNumberString, { defaultCountry: country, extract: false })
-    if (phoneNumber.country === undefined) return 'INVALID'
-    return phoneNumber.country === country ? undefined : 'ANOTHER_COUNTRY'
+    const parsedNumber = parsePhoneNumber(phoneNumberString, { defaultCountry: country, extract: false })
+
+    if (parsedNumber.country === undefined) return 'INVALID'
+    if (parsedNumber.country !== country) return 'ANOTHER_COUNTRY'
+    if (!parsedNumber.isPossible()) return 'TOO_SHORT'
   } catch (error) {
     if (error instanceof ParseError) return error.message
     else throw error
   }
-}
-
-export const validateNumberLengthForCountry = (phoneNumberString, country) => {
-  return validatePhoneNumberLength(phoneNumberString, country)
 }
 
 // AsYouType.getTemplate() doesn't fit because it can give template with or without calling code and +

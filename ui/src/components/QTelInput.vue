@@ -35,8 +35,7 @@ import {
   normalizeCountry,
   isSupportedCountry,
   getNationalMask,
-  validateNumberForCountry,
-  validateNumberLengthForCountry
+  validateNumberForCountry
 } from './utils'
 
 const props = defineProps({
@@ -120,10 +119,17 @@ const number = computed(() => `+${callingCode.value}${nationalNumber.value || ''
 const inputElement = ref()
 const mask = computed(() => getNationalMask(country.value))
 
+const validLength = computed(() => mask.value.match(/#/g).length)
+
+const validateLength = () => {
+  if (nationalNumber.value.length < validLength.value) return 'TOO_SHORT'
+  if (nationalNumber.value.length > validLength.value) return 'TOO_LONG'
+}
+
 const validationStatus = computed(() => {
   switch (props.strictness) {
     case 'LENGTH':
-      return validateNumberLengthForCountry(number.value, country.value)
+      return validateLength()
     case 'FULL':
       return validateNumberForCountry(number.value, country.value)
   }
@@ -131,7 +137,9 @@ const validationStatus = computed(() => {
   return undefined
 })
 
-const checkValid = () => validationStatus.value === undefined
+const checkValid = () => {
+  return validationStatus.value === undefined
+}
 
 watch(() => props.modelValue, (newValue) => {
   if (newValue === number.value) return
