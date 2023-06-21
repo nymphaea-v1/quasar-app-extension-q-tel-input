@@ -71,6 +71,14 @@ const props = defineProps({
       return ['NONE', 'LENGTH', 'FULL'].includes(value)
     }
   },
+  dropdownProps: {
+    type: Object,
+    default: undefined
+  },
+  search: {
+    type: Boolean,
+    default: false
+  },
   outlined: {
     type: Boolean,
     default: false
@@ -80,14 +88,6 @@ const props = defineProps({
     default: false
   },
   rounded: {
-    type: Boolean,
-    default: false
-  },
-  dropdownProps: {
-    type: Object,
-    default: undefined
-  },
-  search: {
     type: Boolean,
     default: false
   }
