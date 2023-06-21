@@ -16,6 +16,7 @@
         v-model="country"
         :search="search"
         :country-list="validatedCountryList"
+        :readonly="readonly"
         class="q-tel-input__select"
         @update:model-value="inputElement.validate()"
       />
@@ -76,6 +77,10 @@ const props = defineProps({
     default: undefined
   },
   search: {
+    type: Boolean,
+    default: false
+  },
+  readonly: {
     type: Boolean,
     default: false
   },

@@ -4,6 +4,7 @@
     dense
     square
     class="q-country-code-select"
+    :class="{ 'q-country-code-select--readonly': readonly }"
   >
     <template #label>
       <div class="q-country-code-select__selected q-country-code-option">
@@ -78,6 +79,10 @@ const props = defineProps({
   search: {
     type: Boolean,
     default: true
+  },
+  readonly: {
+    type: Boolean,
+    default: false
   }
 })
 
