@@ -173,4 +173,11 @@ const inputModifierClasses = computed(() => {
     'q-tel-input--rounded': props.rounded
   }
 })
+
+defineExpose({
+  validationStatus,
+  country,
+  callingCode,
+  nationalNumber
+})
 </script>
