@@ -81,6 +81,7 @@ const TOGGLE_OPTIONS = [
   'filled',
   'borderless',
   'rounded',
+  'readonly',
   'search'
 ]
 
