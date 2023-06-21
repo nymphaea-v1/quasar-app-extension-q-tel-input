@@ -20,6 +20,13 @@
         @update:model-value="inputElement.validate()"
       />
     </template>
+
+    <template
+      v-for="(_, slot) of $slots"
+      #[slot]
+    >
+      <slot :name="slot" />
+    </template>
   </q-input>
 </template>
 
