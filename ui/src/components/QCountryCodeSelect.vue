@@ -10,7 +10,7 @@
       <div class="q-country-code-select__selected q-country-code-option">
         <country-flag
           size="small"
-          :country="selectedCountry ?? 'KZ'"
+          :country="selectedCountry || 'KZ'"
           class="q-country-code-option__flag q-country-code-option__flag--basic"
           :class="{'q-country-code-option__flag--unknown': selectedCountry === undefined }"
         />

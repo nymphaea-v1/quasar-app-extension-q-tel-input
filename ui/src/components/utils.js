@@ -44,7 +44,7 @@ export const getCountriesByCallingCode = (callingCode) => {
   return result
 }
 
-export const proceedNumber = (number) => {
+export const parseNumber = (number) => {
   if (typeof number !== 'string' || number.trim() === '') {
     return undefined
   }

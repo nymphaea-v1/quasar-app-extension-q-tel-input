@@ -18,7 +18,7 @@
         :country-list="validatedCountryList"
         :readonly="readonly"
         class="q-tel-input__select"
-        @update:model-value="onCountryChange"
+        @update:model-value="changeCountry"
       />
     </template>
 
@@ -39,7 +39,7 @@ import { ref, computed, watch } from 'vue'
 
 import {
   extractNumbers,
-  proceedNumber,
+  parseNumber,
   countriesMap,
   normalizeCountry,
   isSupportedCountry,
@@ -141,12 +141,53 @@ const nationalNumber = ref()
 const country = ref(fallbackCountry.value)
 const mask = ref()
 
-const callingCode = computed(() => countriesMap[country.value]?.callingCode)
-const validLength = computed(() => mask.value.match(/#/g).length)
+const callingCode = computed(() => {
+  const countryInfo = countriesMap[country.value]
+  return countryInfo ? countryInfo.callingCode : undefined
+})
+
 const number = computed(() => {
   if (callingCode.value === undefined) return nationalNumber.value || ''
   return `+${callingCode.value}${nationalNumber.value || ''}`
 })
+
+const changeCountry = (value) => {
+  const oldCountry = country.value
+
+  country.value = value
+  mask.value = getNationalMask(value)
+  inputElement.value.validate()
+
+  emit('update:country', { old: oldCountry, new: value })
+}
+
+const processNumber = (value) => {
+  if (value === number.value) return
+
+  const parsedNumber = parseNumber(value)
+  if (!parsedNumber) {
+    mask.value = undefined
+    country.value = ''
+    nationalNumber.value = extractNumbers(value)
+
+    return
+  }
+
+  mask.value = parsedNumber.mask
+  nationalNumber.value = parsedNumber.nationalNumber
+  country.value = parsedNumber.country ||
+    parsedNumber.possibleCountries[0] ||
+    fallbackCountry.value
+}
+
+watch(() => props.modelValue, processNumber, { immediate: true })
+
+watch(number, (newValue) => {
+  if (newValue === props.modelValue) return
+  emit('update:modelValue', newValue)
+})
+
+const validLength = computed(() => mask.value && mask.value.match(/#/g).length)
 
 const validators = {
   length: () => {
@@ -167,45 +208,16 @@ const validators = {
 }
 
 const validator = computed(() => {
-  const strictness = props.strictness?.toLowerCase()
-  return strictness === 'none' ? undefined : validators[strictness] || validators.number
+  if (typeof props.strictness !== 'string') return validators.number
+
+  const strictness = props.strictness.toLowerCase()
+  return strictness === 'none' ? () => undefined : validators[strictness] || validators.number
 })
 
-const validationStatus = computed(() => validator.value?.call())
-const checkValid = () => (validationStatus.value === undefined)
+const validationStatus = computed(() => validator.value.call())
 
-watch(() => props.modelValue, (newValue) => {
-  if (newValue === number.value) return
-
-  const proceededNumber = proceedNumber(newValue)
-  if (!proceededNumber) {
-    mask.value = undefined
-    country.value = ''
-    nationalNumber.value = extractNumbers(newValue)
-
-    return
-  }
-
-  mask.value = proceededNumber.mask
-  nationalNumber.value = proceededNumber.nationalNumber
-  country.value = proceededNumber.country ||
-    proceededNumber.possibleCountries[0] ||
-    fallbackCountry.value
-}, { immediate: true })
-
-watch(number, (newValue) => {
-  if (newValue === props.modelValue) return
-  emit('update:modelValue', newValue)
-})
-
-const onCountryChange = (value) => {
-  const oldCountry = country.value
-
-  country.value = value
-  mask.value = getNationalMask(value)
-  inputElement.value.validate()
-
-  emit('update:country', { old: oldCountry, new: value })
+const checkValid = () => {
+  return validationStatus.value === undefined
 }
 
 const inputModifierClasses = computed(() => {
