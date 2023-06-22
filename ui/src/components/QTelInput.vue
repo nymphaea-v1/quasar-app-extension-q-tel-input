@@ -13,7 +13,7 @@
     <template #prepend>
       <q-country-code-select
         v-bind="dropdownProps"
-        v-model="country"
+        :model-value="country"
         :search="search"
         :country-list="validatedCountryList"
         :readonly="readonly"
@@ -103,7 +103,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue', 'update:country'])
 
 const validatedDefaultCountry = computed(() => {
   return normalizeCountry(props.defaultCountry)
@@ -189,8 +189,13 @@ watch(number, (newValue) => {
 })
 
 const onCountryChange = (value) => {
+  const oldCountry = country.value
+
+  country.value = value
   mask.value = getNationalMask(value)
   inputElement.value.validate()
+
+  emit('update:country', { old: oldCountry, new: value })
 }
 
 const inputModifierClasses = computed(() => {
