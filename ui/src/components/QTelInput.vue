@@ -35,7 +35,7 @@
 import { QInput } from 'quasar'
 import QCountryCodeSelect from './QCountryCodeSelect.vue'
 
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
 
 import {
   extractNumbers,
@@ -44,7 +44,8 @@ import {
   normalizeCountry,
   isSupportedCountry,
   getNationalMask,
-  validateNumberForCountry
+  validateNumberForCountry,
+  LostSymbolsBuffer
 } from './utils'
 
 const props = defineProps({
@@ -77,6 +78,10 @@ const props = defineProps({
   validateFn: {
     type: Function,
     default: () => undefined
+  },
+  lostSymbolsMaxLength: {
+    type: Number,
+    default: 10
   },
   dropdownProps: {
     type: Object,
@@ -140,6 +145,7 @@ const inputElement = ref()
 const nationalNumber = ref()
 const country = ref(fallbackCountry.value)
 const mask = ref()
+const lostSymbols = ref(new LostSymbolsBuffer(props.lostSymbolsMaxLength))
 
 const callingCode = computed(() => {
   const countryInfo = countriesMap[country.value]
@@ -150,6 +156,16 @@ const number = computed(() => {
   if (callingCode.value === undefined) return nationalNumber.value || ''
   return `+${callingCode.value}${nationalNumber.value || ''}`
 })
+
+const maskLength = computed(() => mask.value && mask.value.match(/#/g).length)
+
+const inspectNationalNumberLength = () => {
+  const nationalNumberLength = nationalNumber.value ? nationalNumber.value.length : 0
+  const difference = maskLength.value - nationalNumberLength
+
+  if (difference < 0) lostSymbols.value.add(nationalNumber.value.slice(difference))
+  else if (difference > 0) nextTick(() => (nationalNumber.value += lostSymbols.value.restore(difference)))
+}
 
 const changeCountry = (value) => {
   const oldCountry = country.value
@@ -180,6 +196,18 @@ const processNumber = (value) => {
     fallbackCountry.value
 }
 
+watch([nationalNumber, mask], ([newNumber, newMask]) => {
+  if (!newNumber) {
+    lostSymbols.value.reset()
+    return
+  }
+
+  if (!newMask) {
+    // No mask = input is not limited
+    nextTick(() => (nationalNumber.value += lostSymbols.value.restoreAll()))
+  } else inspectNationalNumberLength()
+})
+
 watch(() => props.modelValue, processNumber, { immediate: true })
 
 watch(number, (newValue) => {
@@ -187,12 +215,10 @@ watch(number, (newValue) => {
   emit('update:modelValue', newValue)
 })
 
-const validLength = computed(() => mask.value && mask.value.match(/#/g).length)
-
 const validators = {
   length: () => {
-    if (!nationalNumber.value || nationalNumber.value.length < validLength.value) return 'TOO_SHORT'
-    if (nationalNumber.value.length > validLength.value) return 'TOO_LONG'
+    if (!nationalNumber.value || nationalNumber.value.length < maskLength.value) return 'TOO_SHORT'
+    if (nationalNumber.value.length > maskLength.value) return 'TOO_LONG'
   },
   number: () => validateNumberForCountry(number.value, country.value),
   custom: () => {
