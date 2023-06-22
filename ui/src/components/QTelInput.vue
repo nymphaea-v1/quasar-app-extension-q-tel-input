@@ -180,6 +180,14 @@ const changeCountry = (value) => {
 const processNumber = (value) => {
   if (value === number.value) return
 
+  if (!value) {
+    mask.value = getNationalMask(fallbackCountry.value)
+    country.value = fallbackCountry.value
+    nationalNumber.value = ''
+
+    return
+  }
+
   const parsedNumber = parseNumber(value)
   if (!parsedNumber) {
     mask.value = undefined
