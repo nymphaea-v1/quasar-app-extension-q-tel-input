@@ -18,7 +18,7 @@
         :country-list="validatedCountryList"
         :readonly="readonly"
         class="q-tel-input__select"
-        @update:model-value="inputElement.validate()"
+        @update:model-value="onCountryChange"
       />
     </template>
 
@@ -136,12 +136,12 @@ const fallbackCountry = computed(() => {
 })
 
 const inputElement = ref()
-const country = ref(fallbackCountry.value)
 const nationalNumber = ref()
+const country = ref(fallbackCountry.value)
+const mask = ref()
 
 const callingCode = computed(() => countriesMap[country.value].callingCode)
 const number = computed(() => `+${callingCode.value}${nationalNumber.value || ''}`)
-const mask = computed(() => getNationalMask(country.value))
 const validLength = computed(() => mask.value.match(/#/g).length)
 
 const validators = {
@@ -176,6 +176,7 @@ watch(() => props.modelValue, (newValue) => {
   const proceededNumber = proceedNumber(newValue)
   if (!proceededNumber) return
 
+  mask.value = proceededNumber.mask
   nationalNumber.value = proceededNumber.nationalNumber
   country.value = proceededNumber.country ||
     proceededNumber.possibleCountries[0] ||
@@ -186,6 +187,11 @@ watch(number, (newValue) => {
   if (newValue === props.modelValue) return
   emit('update:modelValue', newValue)
 })
+
+const onCountryChange = (value) => {
+  mask.value = getNationalMask(value)
+  inputElement.value.validate()
+}
 
 const inputModifierClasses = computed(() => {
   return {

@@ -54,6 +54,7 @@ export const proceedNumber = (number) => {
   }
 
   const country = parsedNumber.country
+  const mask = getNationalMask(country)
   const nationalNumber = parsedNumber.nationalNumber
   const isValid = parsedNumber.isValid()
   let possibleCountries = parsedNumber.getPossibleCountries()
@@ -63,7 +64,7 @@ export const proceedNumber = (number) => {
     possibleCountries = getCountriesByCallingCode(parsedNumber.countryCallingCode)
   }
 
-  return { country, possibleCountries, nationalNumber, isValid }
+  return { country, mask, possibleCountries, nationalNumber, isValid }
 }
 
 export const validateNumberForCountry = (phoneNumberString, country) => {
