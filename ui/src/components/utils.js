@@ -8,6 +8,10 @@ import {
   ParseError
 } from 'libphonenumber-js'
 
+export const extractNumbers = (value) => {
+  return typeof value === 'string' ? value.replace(/\D/g, '') : ''
+}
+
 const locale = navigator ? navigator.language : 'en'
 const getCountryDisplayName = new Intl.DisplayNames([locale], { type: 'region' })
 
@@ -82,6 +86,8 @@ export const validateNumberForCountry = (phoneNumberString, country) => {
 
 // AsYouType.getTemplate() doesn't fit because it can give template with or without calling code and +
 export const getNationalMask = (country) => {
+  if (!country) return undefined
+
   const phone = getExampleNumber(country, examples)
   const national = phone.format('NATIONAL').split(/\d/g)
 

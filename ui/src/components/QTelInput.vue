@@ -38,6 +38,7 @@ import QCountryCodeSelect from './QCountryCodeSelect.vue'
 import { ref, computed, watch } from 'vue'
 
 import {
+  extractNumbers,
   proceedNumber,
   countriesMap,
   normalizeCountry,
@@ -140,9 +141,12 @@ const nationalNumber = ref()
 const country = ref(fallbackCountry.value)
 const mask = ref()
 
-const callingCode = computed(() => countriesMap[country.value].callingCode)
-const number = computed(() => `+${callingCode.value}${nationalNumber.value || ''}`)
+const callingCode = computed(() => countriesMap[country.value]?.callingCode)
 const validLength = computed(() => mask.value.match(/#/g).length)
+const number = computed(() => {
+  if (callingCode.value === undefined) return nationalNumber.value || ''
+  return `+${callingCode.value}${nationalNumber.value || ''}`
+})
 
 const validators = {
   length: () => {
@@ -164,7 +168,7 @@ const validators = {
 
 const validator = computed(() => {
   const strictness = props.strictness?.toLowerCase()
-  return strictness === 'none' ? undefined : validators[strictness] ?? validators.number
+  return strictness === 'none' ? undefined : validators[strictness] || validators.number
 })
 
 const validationStatus = computed(() => validator.value?.call())
@@ -174,7 +178,13 @@ watch(() => props.modelValue, (newValue) => {
   if (newValue === number.value) return
 
   const proceededNumber = proceedNumber(newValue)
-  if (!proceededNumber) return
+  if (!proceededNumber) {
+    mask.value = undefined
+    country.value = ''
+    nationalNumber.value = extractNumbers(newValue)
+
+    return
+  }
 
   mask.value = proceededNumber.mask
   nationalNumber.value = proceededNumber.nationalNumber
