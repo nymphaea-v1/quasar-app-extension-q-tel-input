@@ -69,8 +69,13 @@ const props = defineProps({
     type: String,
     default: 'FULL',
     validator: (value) => {
-      return ['NONE', 'LENGTH', 'FULL'].includes(value)
+      if (typeof value !== 'string') return false
+      return ['NONE', 'LENGTH', 'FULL', 'CUSTOM'].includes(value.toUpperCase())
     }
+  },
+  validateFn: {
+    type: Function,
+    default: () => undefined
   },
   dropdownProps: {
     type: Object,
@@ -130,36 +135,40 @@ const fallbackCountry = computed(() => {
   return FALLBACK_COUNTRY
 })
 
+const inputElement = ref()
 const country = ref(fallbackCountry.value)
 const nationalNumber = ref()
 
 const callingCode = computed(() => countriesMap[country.value].callingCode)
 const number = computed(() => `+${callingCode.value}${nationalNumber.value || ''}`)
-
-const inputElement = ref()
 const mask = computed(() => getNationalMask(country.value))
-
 const validLength = computed(() => mask.value.match(/#/g).length)
 
-const validateLength = () => {
-  if (nationalNumber.value.length < validLength.value) return 'TOO_SHORT'
-  if (nationalNumber.value.length > validLength.value) return 'TOO_LONG'
+const validators = {
+  length: () => {
+    if (!nationalNumber.value || nationalNumber.value.length < validLength.value) return 'TOO_SHORT'
+    if (nationalNumber.value.length > validLength.value) return 'TOO_LONG'
+  },
+  number: () => validateNumberForCountry(number.value, country.value),
+  custom: () => {
+    const info = {
+      number: number.value,
+      country: country.value,
+      callingCode: callingCode.value,
+      nationalNumber: nationalNumber.value
+    }
+
+    return props.validateFn(info, validators)
+  }
 }
 
-const validationStatus = computed(() => {
-  switch (props.strictness) {
-    case 'LENGTH':
-      return validateLength()
-    case 'FULL':
-      return validateNumberForCountry(number.value, country.value)
-  }
-
-  return undefined
+const validator = computed(() => {
+  const strictness = props.strictness?.toLowerCase()
+  return strictness === 'none' ? undefined : validators[strictness] ?? validators.number
 })
 
-const checkValid = () => {
-  return validationStatus.value === undefined
-}
+const validationStatus = computed(() => validator.value?.call())
+const checkValid = () => (validationStatus.value === undefined)
 
 watch(() => props.modelValue, (newValue) => {
   if (newValue === number.value) return
