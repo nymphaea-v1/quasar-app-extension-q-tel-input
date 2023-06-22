@@ -182,8 +182,8 @@ const processNumber = (value) => {
 
   if (!value) {
     mask.value = getNationalMask(fallbackCountry.value)
-    country.value = fallbackCountry.value
     nationalNumber.value = ''
+    country.value = fallbackCountry.value
 
     return
   }
@@ -191,13 +191,13 @@ const processNumber = (value) => {
   const parsedNumber = parseNumber(value)
   if (!parsedNumber) {
     mask.value = undefined
-    country.value = ''
     nationalNumber.value = extractNumbers(value)
+    country.value = ''
 
     return
   }
 
-  mask.value = parsedNumber.mask
+  mask.value = parsedNumber.mask || getNationalMask(country.value)
   nationalNumber.value = parsedNumber.nationalNumber
   country.value = parsedNumber.country ||
     parsedNumber.possibleCountries[0] ||
