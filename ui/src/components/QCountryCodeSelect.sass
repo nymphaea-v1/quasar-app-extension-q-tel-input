@@ -30,3 +30,15 @@
   .q-country-code-option__flag.q-country-code-option__flag--basic
     transform: scale(0.36)
     margin: -1em -0.8em -0.9em -0.4em
+
+.q-country-code-option__flag--unknown
+  position: relative
+  &::after
+    content: ''
+    position: absolute
+    top: 0
+    left: 0
+    width: 100%
+    height: 100%
+    background-color: #696969
+    z-index: 1

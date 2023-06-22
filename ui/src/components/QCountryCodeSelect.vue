@@ -10,8 +10,9 @@
       <div class="q-country-code-select__selected q-country-code-option">
         <country-flag
           size="small"
-          :country="selectedCountry"
+          :country="selectedCountry ?? 'KZ'"
           class="q-country-code-option__flag q-country-code-option__flag--basic"
+          :class="{'q-country-code-option__flag--unknown': selectedCountry === undefined }"
         />
         <span class="q-country-code-option__label">{{ selectedCallingCode }}</span>
       </div>
@@ -111,12 +112,12 @@ const filteredCountryList = computed(() => processedCountryList.value.filter(({ 
 }))
 
 const selectedCountry = computed({
-  get: () => props.modelValue,
+  get: () => countriesMap[props.modelValue] ? props.modelValue : undefined,
   set: (value) => emit('update:modelValue', value)
 })
 
 const selectedCallingCode = computed(() => {
-  if (typeof selectedCountry.value !== 'string') return undefined
+  if (selectedCountry.value === undefined) return undefined
 
   const country = selectedCountry.value.toUpperCase()
   return country in countriesMap ? `+${countriesMap[country].callingCode}` : undefined
