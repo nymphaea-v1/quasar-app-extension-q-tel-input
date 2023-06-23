@@ -44,31 +44,47 @@ export const getCountriesByCallingCode = (callingCode) => {
   return result
 }
 
-export const parseNumber = (number) => {
-  if (typeof number !== 'string' || number.trim() === '') {
+export const parseCallingCode = (value) => {
+  if (typeof value !== 'string' || !value.startsWith('+')) return undefined
+
+  const callingCode = value.slice(1)
+  const possibleCountries = getCountriesByCallingCode(callingCode)
+
+  return possibleCountries.length === 0
+    ? undefined
+    : { callingCode, possibleCountries }
+}
+
+export const parseNumber = (value) => {
+  if (typeof value !== 'string' || value.trim() === '') {
     return undefined
   }
 
   const asYouType = new AsYouType()
-  asYouType.input(number)
+  asYouType.input(value)
 
   const parsedNumber = asYouType.getNumber()
   if (!parsedNumber) {
-    return undefined
+    const parsedCallingCode = parseCallingCode(value)
+    if (!parsedCallingCode) return undefined
+
+    return {
+      possibleCountries: parsedCallingCode.possibleCountries,
+      nationalNumber: ''
+    }
+  }
+
+  let possibleCountries = parsedNumber.getPossibleCountries()
+  if (possibleCountries.length === 0) {
+    // PhoneNumber.getPossibleCountries() doesn't give you possible options when only PhoneNumber.callingCode present
+    possibleCountries = getCountriesByCallingCode(parsedNumber.countryCallingCode)
+    if (possibleCountries.length === 0) return undefined
   }
 
   const country = parsedNumber.country
-  const mask = getNationalMask(country)
   const nationalNumber = parsedNumber.nationalNumber
-  const isValid = parsedNumber.isValid()
-  let possibleCountries = parsedNumber.getPossibleCountries()
 
-  // PhoneNumber.getPossibleCountries() doesn't give you possible options when only PhoneNumber.callingCode presented
-  if (possibleCountries.length === 0) {
-    possibleCountries = getCountriesByCallingCode(parsedNumber.countryCallingCode)
-  }
-
-  return { country, mask, possibleCountries, nationalNumber, isValid }
+  return { country, possibleCountries, nationalNumber }
 }
 
 export const validateNumberForCountry = (phoneNumberString, country) => {

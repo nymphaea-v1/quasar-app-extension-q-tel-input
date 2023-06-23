@@ -144,7 +144,6 @@ const fallbackCountry = computed(() => {
 const inputElement = ref()
 const nationalNumber = ref()
 const country = ref(fallbackCountry.value)
-const mask = ref()
 const lostSymbols = ref(new LostSymbolsBuffer(props.lostSymbolsMaxLength))
 
 const callingCode = computed(() => {
@@ -153,67 +152,64 @@ const callingCode = computed(() => {
 })
 
 const number = computed(() => {
-  if (callingCode.value === undefined) return nationalNumber.value || ''
-  return `+${callingCode.value}${nationalNumber.value || ''}`
+  if (!nationalNumber.value) return ''
+  if (callingCode.value === undefined) return nationalNumber.value
+  return `+${callingCode.value}${nationalNumber.value}`
 })
 
+const mask = computed(() => getNationalMask(country.value))
 const maskLength = computed(() => mask.value && mask.value.match(/#/g).length)
 
-const inspectNationalNumberLength = () => {
-  const nationalNumberLength = nationalNumber.value ? nationalNumber.value.length : 0
-  const difference = maskLength.value - nationalNumberLength
+const manageLostSymbols = (currentNumber) => {
+  if (!currentNumber) {
+    lostSymbols.value.reset()
+    return
+  }
 
-  if (difference < 0) lostSymbols.value.add(nationalNumber.value.slice(difference))
-  else if (difference > 0) nextTick(() => (nationalNumber.value += lostSymbols.value.restore(difference)))
+  const length = currentNumber.length
+  const difference = maskLength.value ? maskLength.value - length : Infinity
+
+  if (difference < 0) {
+    lostSymbols.value.add(currentNumber.slice(difference))
+    return
+  }
+
+  if (difference > 0 && lostSymbols.value.buffer.length !== 0) {
+    nextTick(() => {
+      nationalNumber.value = currentNumber + lostSymbols.value.restore(difference)
+    })
+  }
 }
 
 const changeCountry = (value) => {
-  const oldCountry = country.value
-
   country.value = value
-  mask.value = getNationalMask(value)
   inputElement.value.validate()
-
-  emit('update:country', { old: oldCountry, new: value })
+  emit('update:country', value)
 }
 
 const processNumber = (value) => {
   if (value === number.value) return
 
   if (!value) {
-    mask.value = getNationalMask(fallbackCountry.value)
     nationalNumber.value = ''
-    country.value = fallbackCountry.value
-
     return
   }
 
   const parsedNumber = parseNumber(value)
   if (!parsedNumber) {
-    mask.value = undefined
     nationalNumber.value = extractNumbers(value)
     country.value = ''
-
     return
   }
 
-  mask.value = parsedNumber.mask || getNationalMask(country.value)
   nationalNumber.value = parsedNumber.nationalNumber
   country.value = parsedNumber.country ||
     parsedNumber.possibleCountries[0] ||
     fallbackCountry.value
 }
 
-watch([nationalNumber, mask], ([newNumber, newMask]) => {
-  if (!newNumber) {
-    lostSymbols.value.reset()
-    return
-  }
-
-  if (!newMask) {
-    // No mask = input is not limited
-    nextTick(() => (nationalNumber.value += lostSymbols.value.restoreAll()))
-  } else inspectNationalNumberLength()
+watch([nationalNumber, mask], ([newNumber, _]) => {
+  manageLostSymbols(newNumber)
 })
 
 watch(() => props.modelValue, processNumber, { immediate: true })
