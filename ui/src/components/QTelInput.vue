@@ -4,6 +4,7 @@
     v-bind="$props"
     :model-value="nationalNumber"
     :rules="[checkValid]"
+    lazy-rules="ondemand"
     :mask="mask"
     unmasked-value
     fill-mask
@@ -164,6 +165,10 @@ const number = computed(() => {
 const mask = computed(() => getNationalMask(country.value))
 const maskLength = computed(() => mask.value && mask.value.match(/#/g).length)
 
+const triggerValidation = () => {
+  inputElement.value.validate()
+}
+
 const manageNationalNumberLength = () => {
   const currentNumber = nationalNumber.value
   if (!currentNumber) {
@@ -188,48 +193,52 @@ const manageNationalNumberLength = () => {
   }
 }
 
-const updateNationalNumberAndCountry = (newCountry, newNationalNumber) => {
+const updateNationalNumberAndCountry = (newCountry, newNationalNumber, triggerValidate = true) => {
   emit('update:country', country.value, newCountry)
   country.value = newCountry
 
   // Use nextTick() here because QInput behaves weird on mask change, returning the old value
   nextTick(() => {
-    lostSymbols.value.reset()
     nationalNumber.value = newNationalNumber
+
+    lostSymbols.value.reset()
+    if (triggerValidate) triggerValidation()
   })
 }
 
-const updateNationalNumber = (newNationalNumber) => {
+const updateNationalNumber = (newNationalNumber, triggerValidate = true) => {
   nationalNumber.value = newNationalNumber
+
   manageNationalNumberLength()
+  if (triggerValidate) triggerValidation()
 }
 
-const resetNationalNumber = () => {
-  updateNationalNumber('')
+const resetNationalNumber = (triggerValidate) => {
+  updateNationalNumber('', triggerValidate)
 }
 
-const updateCountry = (newCountry) => {
+const updateCountry = (newCountry, triggerValidate = true) => {
   country.value = newCountry
   emit('update:country', newCountry)
 
   manageNationalNumberLength()
-  inputElement.value.validate()
+  if (triggerValidate) triggerValidation()
 }
 
-const processNumber = (value) => {
+const processNumber = (value, triggerValidate = false) => {
   if (!value) {
-    resetNationalNumber()
+    resetNationalNumber(triggerValidate)
     return
   }
 
   const parsedNumber = parseNumber(value)
   if (!parsedNumber) {
-    updateNationalNumberAndCountry('', extractDigits(value))
+    updateNationalNumberAndCountry('', extractDigits(value), triggerValidate)
     return
   }
 
   const newCountry = parsedNumber.country || parsedNumber.possibleCountries[0] || fallbackCountry.value
-  updateNationalNumberAndCountry(newCountry, parsedNumber.nationalNumber)
+  updateNationalNumberAndCountry(newCountry, parsedNumber.nationalNumber, triggerValidate)
 }
 
 const processPasted = (event) => {
@@ -247,7 +256,7 @@ const processPasted = (event) => {
   }
 
   if (!nationalNumber.value && pastedText.startsWith('+')) {
-    processNumber(pastedText)
+    processNumber(pastedText, true)
     return
   }
 
