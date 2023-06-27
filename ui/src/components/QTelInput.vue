@@ -10,6 +10,7 @@
     class="q-tel-input"
     :class="inputModifierClasses"
     @update:model-value="updateNationalNumber"
+    @beforeinput="verifyPossible"
     @paste="processPasted"
   >
     <template #prepend>
@@ -272,6 +273,12 @@ const getUnmaskedIndex = (maskedIndex) => {
   return mask.value
     ? (mask.value.slice(0, maskedIndex).match(/#/g) || []).length
     : maskedIndex
+}
+
+const verifyPossible = (event) => {
+  if (event.data && maskLength.value && maskLength.value === nationalNumber.value.length) {
+    event.preventDefault()
+  }
 }
 
 watch(() => props.modelValue, (newValue) => {
