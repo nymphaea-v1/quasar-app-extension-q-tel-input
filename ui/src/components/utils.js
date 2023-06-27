@@ -12,7 +12,7 @@ export const splice = (string, inserted, start, deleteCount = 0) => {
   return string.slice(0, start) + inserted + string.slice(start + deleteCount)
 }
 
-export const extractNumbers = (value) => {
+export const extractDigits = (value) => {
   return typeof value === 'string' ? value.replace(/\D/g, '') : ''
 }
 

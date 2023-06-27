@@ -41,7 +41,7 @@ import { ref, computed, watch, nextTick } from 'vue'
 
 import {
   splice,
-  extractNumbers,
+  extractDigits,
   parseNumber,
   countriesMap,
   normalizeCountry,
@@ -163,7 +163,7 @@ const number = computed(() => {
 const mask = computed(() => getNationalMask(country.value))
 const maskLength = computed(() => mask.value && mask.value.match(/#/g).length)
 
-const manageLostSymbols = () => {
+const manageNationalNumberLength = () => {
   const currentNumber = nationalNumber.value
   if (!currentNumber) {
     lostSymbols.value.reset()
@@ -200,7 +200,7 @@ const updateNationalNumberAndCountry = (newCountry, newNationalNumber) => {
 
 const updateNationalNumber = (newNationalNumber) => {
   nationalNumber.value = newNationalNumber
-  manageLostSymbols()
+  manageNationalNumberLength()
 }
 
 const resetNationalNumber = () => {
@@ -211,7 +211,7 @@ const updateCountry = (newCountry) => {
   country.value = newCountry
   emit('update:country', newCountry)
 
-  manageLostSymbols()
+  manageNationalNumberLength()
   inputElement.value.validate()
 }
 
@@ -223,7 +223,7 @@ const processNumber = (value) => {
 
   const parsedNumber = parseNumber(value)
   if (!parsedNumber) {
-    updateNationalNumberAndCountry('', extractNumbers(value))
+    updateNationalNumberAndCountry('', extractDigits(value))
     return
   }
 
@@ -250,7 +250,7 @@ const processPasted = (event) => {
     return
   }
 
-  const pastedDigits = extractNumbers(pastedText)
+  const pastedDigits = extractDigits(pastedText)
   const unmaskedSelectionStart = getUnmaskedIndex(maskedSelectionStart)
   const unmaskedSelectionEnd = getUnmaskedIndex(maskedSelectionEnd)
   const unmaskedSelectionLength = unmaskedSelectionEnd - unmaskedSelectionStart
