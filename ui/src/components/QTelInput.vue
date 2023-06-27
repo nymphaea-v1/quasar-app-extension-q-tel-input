@@ -2,13 +2,14 @@
   <q-input
     ref="inputElement"
     v-bind="$props"
-    v-model="nationalNumber"
+    :model-value="nationalNumber"
     :rules="[checkValid]"
     :mask="mask"
     unmasked-value
     fill-mask
     class="q-tel-input"
     :class="inputModifierClasses"
+    @update:model-value="updateNationalNumber"
   >
     <template #prepend>
       <q-country-code-select
@@ -18,7 +19,7 @@
         :country-list="validatedCountryList"
         :readonly="readonly"
         class="q-tel-input__select"
-        @update:model-value="changeCountry"
+        @update:model-value="updateCountry"
       />
     </template>
 
@@ -160,7 +161,8 @@ const number = computed(() => {
 const mask = computed(() => getNationalMask(country.value))
 const maskLength = computed(() => mask.value && mask.value.match(/#/g).length)
 
-const manageLostSymbols = (currentNumber) => {
+const manageLostSymbols = () => {
+  const currentNumber = nationalNumber.value
   if (!currentNumber) {
     lostSymbols.value.reset()
     return
@@ -170,54 +172,72 @@ const manageLostSymbols = (currentNumber) => {
   const difference = maskLength.value ? maskLength.value - length : Infinity
 
   if (difference < 0) {
+    nationalNumber.value = currentNumber.slice(0, difference)
     lostSymbols.value.add(currentNumber.slice(difference))
     return
   }
 
   if (difference > 0 && lostSymbols.value.buffer.length !== 0) {
+    // Use nextTick() here for the same reason as below & to not reset caret position
     nextTick(() => {
       nationalNumber.value = currentNumber + lostSymbols.value.restore(difference)
     })
   }
 }
 
-const changeCountry = (value) => {
-  country.value = value
+const updateNationalNumberAndCountry = (newCountry, newNationalNumber) => {
+  emit('update:country', country.value, newCountry)
+  country.value = newCountry
+
+  // Use nextTick() here because QInput behaves weird on mask change, returning the old value
+  nextTick(() => {
+    lostSymbols.value.reset()
+    nationalNumber.value = newNationalNumber
+  })
+}
+
+const updateNationalNumber = (newNationalNumber) => {
+  nationalNumber.value = newNationalNumber
+  manageLostSymbols()
+}
+
+const resetNationalNumber = () => {
+  updateNationalNumber('')
+}
+
+const updateCountry = (newCountry) => {
+  country.value = newCountry
+  emit('update:country', newCountry)
+
+  manageLostSymbols()
   inputElement.value.validate()
-  emit('update:country', value)
 }
 
 const processNumber = (value) => {
-  if (value === number.value) return
-
   if (!value) {
-    nationalNumber.value = ''
+    resetNationalNumber()
     return
   }
 
   const parsedNumber = parseNumber(value)
   if (!parsedNumber) {
-    nationalNumber.value = extractNumbers(value)
-    country.value = ''
+    updateNationalNumberAndCountry('', extractNumbers(value))
     return
   }
 
-  nationalNumber.value = parsedNumber.nationalNumber
-  country.value = parsedNumber.country ||
-    parsedNumber.possibleCountries[0] ||
-    fallbackCountry.value
+  const newCountry = parsedNumber.country || parsedNumber.possibleCountries[0] || fallbackCountry.value
+  updateNationalNumberAndCountry(newCountry, parsedNumber.nationalNumber)
 }
 
-watch([nationalNumber, mask], ([newNumber, _]) => {
-  manageLostSymbols(newNumber)
-})
-
-watch(() => props.modelValue, processNumber, { immediate: true })
+watch(() => props.modelValue, (newValue) => {
+  if (newValue === number.value) return
+  processNumber(newValue)
+}, { immediate: true })
 
 watch(number, (newValue) => {
   if (newValue === props.modelValue) return
   emit('update:modelValue', newValue)
-})
+}, { flush: 'post' })
 
 const validators = {
   length: () => {
