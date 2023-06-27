@@ -10,6 +10,7 @@
     class="q-tel-input"
     :class="inputModifierClasses"
     @update:model-value="updateNationalNumber"
+    @paste="processPasted"
   >
     <template #prepend>
       <q-country-code-select
@@ -39,6 +40,7 @@ import QCountryCodeSelect from './QCountryCodeSelect.vue'
 import { ref, computed, watch, nextTick } from 'vue'
 
 import {
+  splice,
   extractNumbers,
   parseNumber,
   countriesMap,
@@ -227,6 +229,49 @@ const processNumber = (value) => {
 
   const newCountry = parsedNumber.country || parsedNumber.possibleCountries[0] || fallbackCountry.value
   updateNationalNumberAndCountry(newCountry, parsedNumber.nationalNumber)
+}
+
+const processPasted = (event) => {
+  if (!event.clipboardData) return
+
+  event.preventDefault()
+
+  const pastedText = event.clipboardData.getData('text')
+  const maskedSelectionStart = event.target.selectionStart
+  const maskedSelectionEnd = event.target.selectionEnd
+  const maskedSelectionLength = maskedSelectionEnd - maskedSelectionStart
+
+  if (mask.value && mask.value.length === maskedSelectionLength) {
+    resetNationalNumber()
+  }
+
+  if (!nationalNumber.value && pastedText.startsWith('+')) {
+    processNumber(pastedText)
+    return
+  }
+
+  const pastedDigits = extractNumbers(pastedText)
+  const unmaskedSelectionStart = getUnmaskedIndex(maskedSelectionStart)
+  const unmaskedSelectionEnd = getUnmaskedIndex(maskedSelectionEnd)
+  const unmaskedSelectionLength = unmaskedSelectionEnd - unmaskedSelectionStart
+
+  const newNationalNumber = splice(nationalNumber.value, pastedDigits, unmaskedSelectionStart, unmaskedSelectionLength)
+  const newSelectionPosition = getMaskedIndex(unmaskedSelectionStart + pastedDigits.length)
+
+  updateNationalNumber(newNationalNumber)
+  event.target.setSelectionRange(newSelectionPosition, newSelectionPosition)
+}
+
+const getMaskedIndex = (unmaskedIndex) => {
+  return mask.value
+    ? mask.value.split('#').slice(0, unmaskedIndex + 1).join('#').length
+    : unmaskedIndex
+}
+
+const getUnmaskedIndex = (maskedIndex) => {
+  return mask.value
+    ? (mask.value.slice(0, maskedIndex).match(/#/g) || []).length
+    : maskedIndex
 }
 
 watch(() => props.modelValue, (newValue) => {
