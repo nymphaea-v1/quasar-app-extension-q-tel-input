@@ -170,7 +170,7 @@ const triggerValidation = () => {
 }
 
 const manageNationalNumberLength = () => {
-  const currentNumber = nationalNumber.value
+  const currentNumber = nationalNumber.value || ''
   if (!currentNumber) {
     lostSymbols.value.reset()
     return
@@ -199,7 +199,7 @@ const updateNationalNumberAndCountry = (newCountry, newNationalNumber, triggerVa
 
   // Use nextTick() here because QInput behaves weird on mask change, returning the old value
   nextTick(() => {
-    nationalNumber.value = newNationalNumber
+    nationalNumber.value = newNationalNumber || ''
 
     lostSymbols.value.reset()
     if (triggerValidate) triggerValidation()
@@ -207,7 +207,7 @@ const updateNationalNumberAndCountry = (newCountry, newNationalNumber, triggerVa
 }
 
 const updateNationalNumber = (newNationalNumber, triggerValidate = true) => {
-  nationalNumber.value = newNationalNumber
+  nationalNumber.value = newNationalNumber || ''
 
   manageNationalNumberLength()
   if (triggerValidate) triggerValidation()
@@ -285,7 +285,7 @@ const getUnmaskedIndex = (maskedIndex) => {
 }
 
 const verifyPossible = (event) => {
-  if (event.data && maskLength.value && maskLength.value === nationalNumber.value.length) {
+  if (event.data && maskLength.value && nationalNumber.value && maskLength.value === nationalNumber.value.length) {
     event.preventDefault()
   }
 }
