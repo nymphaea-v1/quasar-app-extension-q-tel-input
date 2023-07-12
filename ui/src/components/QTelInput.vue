@@ -247,24 +247,21 @@ const processPasted = (event) => {
   event.preventDefault()
 
   const pastedText = event.clipboardData.getData('text')
-  const maskedSelectionStart = event.target.selectionStart
-  const maskedSelectionEnd = event.target.selectionEnd
-  const maskedSelectionLength = maskedSelectionEnd - maskedSelectionStart
+  const unmaskedSelectionStart = getUnmaskedIndex(event.target.selectionStart)
+  const unmaskedSelectionEnd = getUnmaskedIndex(event.target.selectionEnd)
+  const unmaskedSelectionLength = unmaskedSelectionEnd - unmaskedSelectionStart
 
-  if (mask.value && mask.value.length === maskedSelectionLength) {
+  if (nationalNumber.value && nationalNumber.value.length <= unmaskedSelectionLength) {
     resetNationalNumber()
   }
 
   if (!nationalNumber.value && pastedText.startsWith('+')) {
-    processNumber(pastedText, true)
+    const pastedNumber = `+${extractDigits(pastedText)}`
+    processNumber(pastedNumber, true)
     return
   }
 
   const pastedDigits = extractDigits(pastedText)
-  const unmaskedSelectionStart = getUnmaskedIndex(maskedSelectionStart)
-  const unmaskedSelectionEnd = getUnmaskedIndex(maskedSelectionEnd)
-  const unmaskedSelectionLength = unmaskedSelectionEnd - unmaskedSelectionStart
-
   const newNationalNumber = splice(nationalNumber.value, pastedDigits, unmaskedSelectionStart, unmaskedSelectionLength)
   const newSelectionPosition = getMaskedIndex(unmaskedSelectionStart + pastedDigits.length)
 
