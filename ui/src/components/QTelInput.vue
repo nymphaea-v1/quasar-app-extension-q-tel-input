@@ -43,6 +43,7 @@ import { ref, computed, watch, nextTick } from 'vue'
 
 import {
   splice,
+  isDigit,
   extractDigits,
   parseNumber,
   countriesMap,
@@ -282,7 +283,14 @@ const getUnmaskedIndex = (maskedIndex) => {
 }
 
 const verifyPossible = (event) => {
-  if (!event.data || !maskLength.value || !nationalNumber.value) return
+  if (!event.data) return
+
+  if (!maskLength.value) {
+    if (!isDigit(event.data)) event.preventDefault()
+    return
+  }
+
+  if (!nationalNumber.value) return
 
   const selectionLength = getUnmaskedIndex(event.target.selectionEnd) - getUnmaskedIndex(event.target.selectionStart)
   const freeLength = maskLength.value - (nationalNumber.value.length - selectionLength)
