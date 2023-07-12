@@ -285,9 +285,13 @@ const getUnmaskedIndex = (maskedIndex) => {
 }
 
 const verifyPossible = (event) => {
-  if (event.data && maskLength.value && nationalNumber.value && maskLength.value === nationalNumber.value.length) {
-    event.preventDefault()
-  }
+  if (!event.data || !maskLength.value || !nationalNumber.value) return
+
+  const selectionLength = getUnmaskedIndex(event.target.selectionEnd) - getUnmaskedIndex(event.target.selectionStart)
+  const freeLength = maskLength.value - (nationalNumber.value.length - selectionLength)
+  const dataLength = event.data.length
+
+  if (freeLength < dataLength) event.preventDefault()
 }
 
 watch(() => props.modelValue, (newValue) => {
