@@ -20,14 +20,16 @@ All countries are represent by their [alfa2 code](https://en.wikipedia.org/wiki/
 
 
 ## Props
-| Name           | Type     | Required | Default   | Description                                                                                                    |
-| -------------- | -------- | -------- | --------- | -------------------------------------------------------------------------------------------------------------- |
-| modelValue     | String   | +        | -         | Not formatted international number, e.g. `+7701123456`                                                          |
-| defaultCountry | String   | -        | `US`      | Country that selected by default                                                                               |
-| countryList    | Array    | -        | All       | Available countries in dropdown options list                                                                   |
-| strictness     | String   | -        | `FULL`    | Validation strictness. One of `['NONE', 'LENGTH', 'FULL', 'CUSTOM']` (details below)                           |
-| dropdownProps  | Object   | -        | -         | Props passed to QBtnDropdown                                                                                   |
-| search         | Boolean  | -        | `false`   | Searchbar for countries in dropdown                                                                            |
+| Name                 | Type            | Required | Default   | Description                                                                                                       |
+| -------------------- | --------------- | -------- | --------- | ----------------------------------------------------------------------------------------------------------------- |
+| modelValue           | String          | +        | -         | Not formatted international number, e.g. `+7701123456`                                                            |
+| defaultCountry       | String          | -        | `US`      | Country that selected by default                                                                                  |
+| countryList          | Array           | -        | All       | Available countries in dropdown options list                                                                      |
+| strictness           | String          | -        | `FULL`    | Validation strictness. One of `['NONE', 'LENGTH', 'FULL', 'CUSTOM']` (details below)                              |
+| locales              | [String, Array] | -        | `[]`      | Locales to use for country names in dropdown list. First parameter of [Intl.DisplayNames constructor](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DisplayNames/DisplayNames#parameters) |
+| getDropdownItemLabel | Function        | -        | In descr. | Returns label for specific country in dropdown. Default: (_code, callingCode, name) => `${name} +${callingCode} ` |
+| dropdownProps        | Object          | -        | -         | Props passed to QBtnDropdown                                                                                      |
+| search               | Boolean         | -        | `false`   | Toggles searchbar for countries in dropdown                                                                       |
 
 ...and props available for [`QInput`](https://quasar.dev/vue-components/input#qinput-api).
 
