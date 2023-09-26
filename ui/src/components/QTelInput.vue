@@ -15,6 +15,8 @@
     @paste="processPasted"
   >
     <template #prepend>
+      <slot name="before-dropdown" />
+
       <q-country-code-select
         v-bind="dropdownProps"
         :model-value="country"
@@ -26,6 +28,8 @@
         class="q-tel-input__select"
         @update:model-value="updateCountry"
       />
+
+      <slot name="after-dropdown" />
     </template>
 
     <template
