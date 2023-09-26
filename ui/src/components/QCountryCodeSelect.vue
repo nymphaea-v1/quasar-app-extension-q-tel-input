@@ -62,7 +62,7 @@ import { QBtnDropdown, QItem, QList, QInput, QIcon, ClosePopup as vClosePopup } 
 import { computed, ref } from 'vue'
 import CountryFlag from 'vue-country-flag-next'
 
-import { countries, countriesMap } from './utils'
+import { countries, countryCallingCodesMap, isSupportedCountry, normalizeCountry } from './utils'
 
 const props = defineProps({
   modelValue: {
@@ -73,9 +73,13 @@ const props = defineProps({
     type: Array,
     default: () => countries
   },
+  locales: {
+    type: [String, Array],
+    default: () => []
+  },
   getItemLabel: {
     type: Function,
-    default: (code, callingCode, name) => `${name} +${callingCode}`
+    default: (_code, callingCode, name) => `${name} +${callingCode}`
   },
   search: {
     type: Boolean,
@@ -90,14 +94,17 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue'])
 
 const processedCountryList = computed(() => {
+  const getCountryDisplayName = new Intl.DisplayNames(props.locales, { type: 'region' })
   const result = []
 
   props.countryList.forEach((country) => {
-    const countryInfo = countriesMap[country]
-    if (!countryInfo) return
+    if (!isSupportedCountry(country)) return
 
-    const label = props.getItemLabel(country, countryInfo.callingCode, countryInfo.name)
-    result.push({ label, country, ...countryInfo })
+    const name = getCountryDisplayName.of(country)
+    const callingCode = countryCallingCodesMap[country]
+    const label = props.getItemLabel(country, callingCode, name)
+
+    result.push({ country, name, callingCode, label })
   })
 
   return result
@@ -112,15 +119,17 @@ const filteredCountryList = computed(() => processedCountryList.value.filter(({ 
 }))
 
 const selectedCountry = computed({
-  get: () => countriesMap[props.modelValue] ? props.modelValue : undefined,
+  get: () => {
+    const country = normalizeCountry(props.modelValue)
+    return isSupportedCountry(country) ? country : undefined
+  },
   set: (value) => emit('update:modelValue', value)
 })
 
 const selectedCallingCode = computed(() => {
-  if (selectedCountry.value === undefined) return undefined
-
-  const country = selectedCountry.value.toUpperCase()
-  return country in countriesMap ? `+${countriesMap[country].callingCode}` : undefined
+  return selectedCountry.value
+    ? `+${countryCallingCodesMap[selectedCountry.value]}`
+    : undefined
 })
 
 const selectCountry = (country) => {

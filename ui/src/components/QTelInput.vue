@@ -18,8 +18,10 @@
       <q-country-code-select
         v-bind="dropdownProps"
         :model-value="country"
-        :search="search"
         :country-list="validatedCountryList"
+        :locales="locales"
+        :get-item-label="getDropdownItemLabel"
+        :search="search"
         :readonly="readonly"
         class="q-tel-input__select"
         @update:model-value="updateCountry"
@@ -46,7 +48,7 @@ import {
   isDigit,
   extractDigits,
   parseNumber,
-  countriesMap,
+  countryCallingCodesMap,
   normalizeCountry,
   isSupportedCountry,
   getNationalMask,
@@ -58,20 +60,6 @@ const props = defineProps({
   modelValue: {
     type: String,
     default: ''
-  },
-  defaultCountry: {
-    type: String,
-    default: undefined,
-    validator: (value) => {
-      return isSupportedCountry(normalizeCountry(value))
-    }
-  },
-  countryList: {
-    type: Array,
-    default: undefined,
-    validator: (value) => {
-      return Array.isArray(value) && value.every(value => isSupportedCountry(normalizeCountry(value)))
-    }
   },
   strictness: {
     type: String,
@@ -88,6 +76,28 @@ const props = defineProps({
   lostSymbolsMaxLength: {
     type: Number,
     default: 10
+  },
+  defaultCountry: {
+    type: String,
+    default: undefined,
+    validator: (value) => {
+      return isSupportedCountry(normalizeCountry(value))
+    }
+  },
+  countryList: {
+    type: Array,
+    default: undefined,
+    validator: (value) => {
+      return Array.isArray(value) && value.every(value => isSupportedCountry(normalizeCountry(value)))
+    }
+  },
+  locales: {
+    type: [String, Array],
+    default: undefined
+  },
+  getDropdownItemLabel: {
+    type: Function,
+    default: undefined
   },
   dropdownProps: {
     type: Object,
@@ -150,12 +160,7 @@ const fallbackCountry = computed(() => {
 const inputElement = ref()
 const nationalNumber = ref()
 const country = ref(fallbackCountry.value)
-const lostSymbols = ref(new LostSymbolsBuffer(props.lostSymbolsMaxLength))
-
-const callingCode = computed(() => {
-  const countryInfo = countriesMap[country.value]
-  return countryInfo ? countryInfo.callingCode : undefined
-})
+const callingCode = computed(() => countryCallingCodesMap[country.value])
 
 const number = computed(() => {
   if (!nationalNumber.value) return ''
@@ -165,6 +170,8 @@ const number = computed(() => {
 
 const mask = computed(() => getNationalMask(country.value))
 const maskLength = computed(() => mask.value && mask.value.match(/#/g).length)
+
+const lostSymbols = ref(new LostSymbolsBuffer(props.lostSymbolsMaxLength))
 
 const triggerValidation = () => {
   inputElement.value.validate()

@@ -20,18 +20,10 @@ export const extractDigits = (value) => {
   return typeof value === 'string' ? value.replace(/\D/g, '') : ''
 }
 
-const locale = navigator ? navigator.language : 'en'
-const getCountryDisplayName = new Intl.DisplayNames([locale], { type: 'region' })
-
 export const countries = getCountries()
 
-export const countriesMap = Object.fromEntries(countries.map((country) => {
-  const countryInfo = {
-    name: getCountryDisplayName.of(country),
-    callingCode: getCountryCallingCode(country)
-  }
-
-  return [country, countryInfo]
+export const countryCallingCodesMap = Object.fromEntries(countries.map((country) => {
+  return [country, getCountryCallingCode(country)]
 }))
 
 export const normalizeCountry = (country) => {
@@ -39,14 +31,14 @@ export const normalizeCountry = (country) => {
 }
 
 export const isSupportedCountry = (country) => {
-  return typeof country === 'string' && countries.includes(country)
+  return typeof country === 'string' && country in countryCallingCodesMap
 }
 
 export const getCountriesByCallingCode = (callingCode) => {
   const result = []
 
-  Object.entries(countriesMap).forEach(([code, country]) => {
-    if (country.callingCode === callingCode) result.push(code)
+  Object.entries(countryCallingCodesMap).forEach(([code, entryCallingCode]) => {
+    if (entryCallingCode === callingCode) result.push(code)
   })
 
   return result
