@@ -4,6 +4,7 @@
     dense
     square
     class="q-country-code-select"
+    content-class="q-country-code-select__menu"
     :class="{ 'q-country-code-select--readonly': readonly }"
   >
     <template #label>
@@ -62,7 +63,7 @@ import { QBtnDropdown, QItem, QList, QInput, QIcon, ClosePopup as vClosePopup } 
 import { computed, ref } from 'vue'
 import CountryFlag from 'vue-country-flag-next'
 
-import { countries, countryCallingCodesMap, isSupportedCountry, normalizeCountry } from './utils'
+import { countries, countryCallingCodesMap, isSupportedCountry, normalizeCountry } from '../utils/phone-parser'
 
 const props = defineProps({
   modelValue: {

@@ -47,18 +47,15 @@ import QCountryCodeSelect from './QCountryCodeSelect.vue'
 
 import { ref, computed, watch, nextTick } from 'vue'
 
+import { splice, isDigit, extractDigits, LostSymbolsBuffer } from '../utils/helpers'
 import {
-  splice,
-  isDigit,
-  extractDigits,
   parseNumber,
   countryCallingCodesMap,
   normalizeCountry,
   isSupportedCountry,
   getNationalMask,
-  validateNumberForCountry,
-  LostSymbolsBuffer
-} from './utils'
+  validateNumberForCountry
+} from '../utils/phone-parser'
 
 const props = defineProps({
   modelValue: {

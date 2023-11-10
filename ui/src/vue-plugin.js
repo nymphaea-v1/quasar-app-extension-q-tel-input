@@ -1,4 +1,5 @@
 import QTelInput from './components/QTelInput.vue'
+import * as phoneParser from './utils/phone-parser'
 
 const version = __UI_VERSION__
 
@@ -10,5 +11,6 @@ function install (app) {
 export {
   version,
   QTelInput,
-  install
+  install,
+  phoneParser
 }

@@ -8,18 +8,6 @@ import {
   ParseError
 } from 'libphonenumber-js'
 
-export const splice = (string, inserted, start, deleteCount = 0) => {
-  return string.slice(0, start) + inserted + string.slice(start + deleteCount)
-}
-
-export const isDigit = (char) => {
-  return /^\d$/.test(char)
-}
-
-export const extractDigits = (value) => {
-  return typeof value === 'string' ? value.replace(/\D/g, '') : ''
-}
-
 export const countries = getCountries()
 
 export const countryCallingCodesMap = Object.fromEntries(countries.map((country) => {
@@ -115,31 +103,13 @@ export const getNationalMask = (country) => {
   return mask
 }
 
-export class LostSymbolsBuffer {
-  constructor (maxLength) {
-    this.buffer = []
-    this._maxLength = maxLength
-  }
+export const formatNumber = (number, emptyDigit = '#') => {
+  const parsedNumber = parseNumber(number)
+  if (!parsedNumber) return number
 
-  add (string) {
-    if (!string) return
+  const country = parsedNumber.country || parsedNumber.possibleCountries[0]
+  const mask = getNationalMask(country)
+  const numberDigits = parsedNumber.nationalNumber.split('')
 
-    this.buffer.unshift(...(string.split('')))
-    this.buffer.splice(this._maxLength)
-  }
-
-  restore (length) {
-    if (length === 0) return ''
-
-    length = Math.min(length, this.buffer.length)
-    return this.buffer.splice(0, length).join('')
-  }
-
-  restoreAll () {
-    return this.restore(this.buffer.length)
-  }
-
-  reset () {
-    this.buffer = []
-  }
+  return `+${countryCallingCodesMap[country]} ${mask.replaceAll('#', () => numberDigits.shift() || emptyDigit)}`
 }
